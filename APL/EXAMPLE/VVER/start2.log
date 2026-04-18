@@ -1,0 +1,8 @@
+nohup: ignoring input
+Traceback (most recent call last):
+  File "/home/adminsrv/projects/Vorobiova_K/Lab_8/VVER/def_gd.py", line 53, in <module>
+    fuel = openmc.Material.mix_materials([Gd2O3, UO2], [0.00045, 0.99945], 'wo') # !!!!!!!!!!!!!!!!!!!!
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/adminsrv/openmc_v15/openmc/material.py", line 1592, in mix_materials
+    raise ValueError(msg)
+ValueError: A non-zero void fraction is not acceptable for percent_type: wo

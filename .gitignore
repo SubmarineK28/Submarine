@@ -1,0 +1,9 @@
+sections/
+*.h5
+*.xml
+__pycache__/
+statepoint.*
+summary.*
+settings.*
+tallies.*
+Sidit_vorona.txt

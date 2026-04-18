@@ -1,0 +1,55 @@
+nohup: ignoring input
+/home/adminsrv/openmc_v15/openmc/model/funcs.py:124: FutureWarning: The hexagonal_prism(...) function has been replaced by the HexagonalPrism(...) class. Future versions of OpenMC will not accept hexagonal_prism.
+  warn("The hexagonal_prism(...) function has been replaced by the "
+/home/adminsrv/openmc_v15/openmc/source.py:658: FutureWarning: This class is deprecated in favor of 'IndependentSource'
+  warnings.warn("This class is deprecated in favor of 'IndependentSource'", FutureWarning)
+/home/adminsrv/.local/lib/python3.11/site-packages/scipy/optimize/_minpack_py.py:178: RuntimeWarning: The iteration is not making good progress, as measured by the 
+  improvement from the last ten iterations.
+  warnings.warn(msg, RuntimeWarning)
+/home/adminsrv/projects/Vorobiova_K/Lab_8/VVER/gd/do.py:240: RuntimeWarning: invalid value encountered in divide
+  pu239_norm = pu239 / pu239[-1]
+/home/adminsrv/projects/Vorobiova_K/Lab_8/VVER/gd/do.py:241: RuntimeWarning: invalid value encountered in divide
+  pu240_norm = pu240 / pu240[-1]
+ ================= k = -0.00880 * burnup + 1.15122 =================
+ ================= k = 0.00017 * burnup^2 + 1.32541 =================
+k(x_1) = 1.37609 при burnup = 17.18757
+k(x_3) = 1.46111 при burnup = 28.12511
+[[1.00239248e+00 7.03485530e-04]
+ [1.00292194e+00 6.95306170e-04]
+ [1.09084893e+00 7.32185849e-04]
+ [1.25301812e+00 8.92100200e-04]
+ [1.23949184e+00 8.59431239e-04]
+ [1.18529549e+00 8.55415090e-04]
+ [1.12996853e+00 8.23001220e-04]
+ [1.07041849e+00 8.03561036e-04]
+ [1.01037108e+00 7.86094705e-04]
+ [9.49963161e-01 7.69912912e-04]
+ [8.90429660e-01 7.48001515e-04]
+ [8.33978696e-01 7.24857849e-04]
+ [7.86098967e-01 6.71274129e-04]
+ [7.42448430e-01 6.72773505e-04]
+ [7.11696369e-01 6.30078670e-04]
+ [6.90051187e-01 6.10471700e-04]
+ [6.71505700e-01 6.18018889e-04]
+ [6.61487220e-01 6.23016390e-04]
+ [6.52807103e-01 6.04922843e-04]
+ [6.46595054e-01 5.89561826e-04]
+ [6.41799891e-01 5.72740409e-04]
+ [6.39341497e-01 6.14015729e-04]
+ [6.36482636e-01 6.33473061e-04]
+ [6.33834452e-01 6.11418347e-04]]
+[1.42129665e+20 1.42129665e+20 1.42129665e+20 1.42129665e+20
+ 1.42129665e+20 1.42129665e+20 1.42129665e+20 1.42129665e+20
+ 1.42129665e+20 1.42129665e+20 1.42129665e+20 1.42129665e+20
+ 1.42129665e+20 1.42129665e+20 1.42129665e+20 1.42129665e+20
+ 1.42129665e+20 1.42129665e+20 1.42129665e+20 1.42129665e+20
+ 1.42129665e+20 1.42129665e+20 1.42129665e+20 1.42129665e+20]
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+[2.76047017e+17 2.74161889e+17 1.38057268e+17 4.14385541e+15
+ 1.58739371e+14 1.88456038e+14 2.13500749e+14 2.35625617e+14
+ 2.59205715e+14 2.85278245e+14 3.16286964e+14 3.52632643e+14
+ 3.95130280e+14 4.46425444e+14 5.03000753e+14 5.63991354e+14
+ 6.20421257e+14 6.87319783e+14 7.48405491e+14 8.01325216e+14
+ 8.65499978e+14 9.27621393e+14 9.91110206e+14 1.05306415e+15]
