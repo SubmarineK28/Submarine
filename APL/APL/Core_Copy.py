@@ -2,6 +2,7 @@ import openmc
 import numpy as np
 import sys
 from pathlib import Path
+import matplotlib.pyplot as plt
 
 # Подключаем текущую папку TWS/TWS_with_RO
 PROJECT_DIR = Path(__file__).resolve().parent
@@ -32,9 +33,7 @@ lat_step = fa_step - tvs_gap / 2.0
 z_down = 0.0
 z_up = 168.0
 
-# Запуск расчета можно включить вручную
-RUN_OPENMC = False
-
+RUN_OPENMC = True
 
 # -------------------------------
 # MATERIALS
@@ -56,6 +55,7 @@ materials_lst = [
 materials = openmc.Materials(materials_lst)
 materials.export_to_xml()
 
+openmc.config['cross_sections'] = "/home/sparrow/APL/sections/endfb-viii.0-hdf5/cross_sections.xml"
 
 # -------------------------------
 # OUTER / LATTICE
@@ -69,7 +69,6 @@ lat.pitch = (lat_step,)
 lat.outer = outer_universe
 lat.orientation = "x"
 
-
 # -------------------------------
 # TVS OBJECTS (аналог FA0..FA3)
 # -------------------------------
@@ -81,10 +80,6 @@ def make_fa(fuel_material, idx, level = 0, absorber_enriched = absorber_enriched
         boundary="transmission",
         is_void=False,
     )
-
-
-# Аналоги ваших FA0/FA1/FA2/FA3
-# Водяные "сборки" как отдельные universe с coolant
 
 tvs0 = [make_fa(fuel_type1inner, i) for i in range(1, 103)] # 15
 tvs1 = [make_fa(fuel_type2inner, i + 1000) for i in range(1, 20)] # 13
@@ -101,16 +96,14 @@ tvs0_ro5 = [make_fa(fuel_type1inner, i, 6) for i in range(1, 7)] # 15
 tvs0_ro6 = [make_fa(fuel_type1inner, i, 6) for i in range(1, 7)] # 15
 tvs0_ro7 = [make_fa(fuel_type1inner, i, 6) for i in range(1, 7)] # 15
 
-
 tvs_water = []
 for i in range(7):
     wu = openmc.Universe(name=f"water_fa_{i + 4000}")
     wu.add_cell(openmc.Cell(fill=coolant))
     tvs_water.append(wu)
 
-
 # -------------------------------
-# RINGS (в том же стиле, что у тебя)
+# RINGS 
 # -------------------------------
 i = 0
 j = 0
@@ -185,18 +178,29 @@ print("Количество ТВС в решетке:", len(ring6) + len(ring5) 
 # -------------------------------
 # GEOMETRY
 # -------------------------------
-h_cluster = 150.0
+h_cluster = 200.0 # thick = (150 - 131.3)/2 = 9.35
+steel_thickness = 5.0
+h_duct = h_cluster + 2.0 * steel_thickness  # 210 см
+
 cluster_border = openmc.model.HexagonalPrism(
     edge_length=h_cluster / np.sqrt(3.0),
     orientation="x",
-    boundary_type="reflective",
+    boundary_type="transmission",
+)
+
+duct_border = openmc.model.HexagonalPrism(
+    edge_length=h_duct / np.sqrt(3.0),
+    orientation="x",
+    boundary_type="vacuum",
 )
 
 z_plane_down = openmc.ZPlane(z0=z_down, boundary_type="vacuum")
 z_plane_up = openmc.ZPlane(z0=z_up, boundary_type="vacuum")
 
-main_cell = openmc.Cell(fill=lat, region=-cluster_border & +z_plane_down & -z_plane_up)
-main_univ = openmc.Universe(cells=[main_cell])
+core_cell = openmc.Cell(fill=lat, region=-cluster_border & +z_plane_down & -z_plane_up)
+steel_shell_cell = openmc.Cell(fill=steel, region=+cluster_border & -duct_border & +z_plane_down & -z_plane_up)
+
+main_univ = openmc.Universe(cells=[core_cell, steel_shell_cell])
 geomi = openmc.Geometry(main_univ)
 geomi.export_to_xml()
 
@@ -207,7 +211,7 @@ geomi.export_to_xml()
 p = openmc.Plot()
 p.basis = "xy"
 p.origin = (0.0, 0.0, 25.0)
-p.filename = "core_xy"
+p.filename = "core_xy_copy"
 p.width = (300.0, 300.0)
 p.pixels = (5000, 5000)
 p.color_by = "material"
@@ -230,9 +234,8 @@ plots = openmc.Plots([p])
 plots.export_to_xml()
 openmc.plot_geometry()
 
-# Дополнительно YZ
 p.origin = (0.0, 0.0, (z_down + z_up) / 2.0)
-p.filename = "core_yz"
+p.filename = "core_yz_copy"
 p.basis = "yz"
 p.width = (300.0, z_up - z_down)
 p.pixels = (5000, 5000)
@@ -256,23 +259,59 @@ plots = openmc.Plots([p])
 plots.export_to_xml()
 openmc.plot_geometry()
 
-
 # -------------------------------
 # SETTINGS
 # -------------------------------
-#batches = 5
-#inactive = 1
-#particles = 1000
-#
-#settings = openmc.Settings()
-#settings.batches = batches
-#settings.inactive = inactive
-#settings.particles = particles
-#settings.output = {"tallies": True}
-#settings.temperature = {"method": "interpolation", "multipole": True}
-#settings.source = openmc.Source(space=openmc.stats.Point((0.0, 0.0, 80.0)))
-#settings.export_to_xml()
+point = openmc.stats.Point((0, 0, 80))
+src = openmc.Source(space=point)
+
+settings = openmc.Settings()
+settings.source = src
+settings.batches = 10
+settings.inactive = 1
+settings.particles = 20
+settings.temperature = {'multipole': True, 'method': 'interpolation', 'range': [290, 2500]}
+settings.export_to_xml()
+
+tallies_file = openmc.Tallies()
+
+energy_filter = openmc.EnergyFilter([0., 0.625, 20.0e6])
+
+mesh = openmc.RegularMesh()
+mesh.dimension = (360, 210, 60)          
+mesh.lower_left = (-180, -105, -30)
+mesh.upper_right = (180.0, 105, 30)
+
+mesh_filter = openmc.MeshFilter(mesh)
+
+tally = openmc.Tally(name='flux')
+tally.filters = [mesh_filter]
+tally.filters.append(energy_filter)
+tally.scores = ['flux']
+tallies_file.append(tally)
+tallies_file.export_to_xml()
 
 
 if RUN_OPENMC:
     openmc.run()
+
+sp = openmc.StatePoint('statepoint.10.h5')   
+t = sp.get_tally(name='flux')
+
+data = t.get_reshaped_data(value='mean', expand_dims=True).squeeze()
+thermal = data[..., 0]  
+fast = data[..., 1]      
+
+nx, ny, nz = 360, 210, 60
+x0, y0, z0 = -180, -105, -30
+x1, y1, z1 = 180, 105, 30
+
+# 3) 2D срез (например, по центру z)
+k = nz // 2
+plt.figure()
+plt.imshow(thermal[:, :, k].T, origin='lower', extent=[x0, x1, y0, y1], aspect='auto')
+plt.colorbar(label='Flux')
+plt.xlabel('x, cm')
+plt.ylabel('y, cm')
+plt.title('Thermal flux, z=0 slice')
+plt.show()

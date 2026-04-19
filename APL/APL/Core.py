@@ -55,7 +55,7 @@ materials_lst = [
 materials = openmc.Materials(materials_lst)
 materials.export_to_xml()
 
-openmc.config['cross_sections'] = "/home/sparrow/APL/sections/endfb-viii.0-hdf5/cross_sections.xml"
+openmc.config['cross_sections'] = "/home/sparrowmsu/apl/sections/endfb-viii.0-hdf5/cross_sections.xml"
 
 # -------------------------------
 # OUTER / LATTICE
@@ -81,20 +81,26 @@ def make_fa(fuel_material, idx, level = 0, absorber_enriched = absorber_enriched
         is_void=False,
     )
 
-tvs0 = [make_fa(fuel_type1inner, i) for i in range(1, 103)] # 15
-tvs1 = [make_fa(fuel_type2inner, i + 1000) for i in range(1, 20)] # 13
-tvs2 = [make_fa(fuel_type3inner, i + 2000) for i in range(1, 18 + 24 + 30 + 36 + 36 + 1)]
-tvs3 = [make_fa(fuel_type4inner, i + 3000) for i in range(7 + 12 + 1 + 2)]
+tvs0 = [make_fa(fuel_type1inner, i) for i in range(1, 97)] # 15
+tvs1 = [make_fa(fuel_type2inner, i + 96) for i in range(1, 13)] # 13
+tvs2 = [] # [make_fa(fuel_type3inner, i + ) for i in range(1, )] 
+tvs3 = [] # [make_fa(fuel_type4inner, i + ) for i in range(1, )]
 
-tvs1_ro1 = [make_fa(fuel_type2inner, i + 1000, 6) for i in range(1, 2)] # 13
-tvs0_ro1 = [make_fa(fuel_type1inner, i, 6) for i in range(1, 7)] # 15
+tvs1_ro1 = [make_fa(fuel_type2inner, i + 108, 6) for i in range(1, 2)] # 13
+tvs0_ro1 = [make_fa(fuel_type1inner, i + 109, 6) for i in range(1, 7)] # 15
 
-tvs1_ro2 = [make_fa(fuel_type2inner, i + 1000, 5) for i in range(1, 7)] # 13
-tvs0_ro3 = [make_fa(fuel_type1inner, i, 6) for i in range(1, 7)] # 15
-tvs0_ro4 = [make_fa(fuel_type1inner, i, 6) for i in range(1, 7)] # 15
-tvs0_ro5 = [make_fa(fuel_type1inner, i, 6) for i in range(1, 7)] # 15
-tvs0_ro6 = [make_fa(fuel_type1inner, i, 6) for i in range(1, 7)] # 15
-tvs0_ro7 = [make_fa(fuel_type1inner, i, 6) for i in range(1, 7)] # 15
+tvs1_ro2 = [make_fa(fuel_type2inner, i + 115, 5) for i in range(1, 7)] # 13
+tvs0_ro3 = [] # [make_fa(fuel_type1inner, i, 6) for i in range(1, 7)] # 15
+tvs0_ro4 = []
+tvs0_ro5 = []
+tvs0_ro6 = []
+tvs0_ro7 = []
+
+all_tvs = (
+    tvs0 + tvs1 + tvs2 + tvs3 +
+    tvs1_ro1 + tvs0_ro1 + tvs1_ro2 +
+    tvs0_ro3 + tvs0_ro4 + tvs0_ro5 + tvs0_ro6 + tvs0_ro7
+)
 
 tvs_water = []
 for i in range(7):
@@ -103,71 +109,45 @@ for i in range(7):
     tvs_water.append(wu)
 
 # -------------------------------
-# RINGS 
+# RINGS
 # -------------------------------
-i = 0
-j = 0
+
+j0 = 0          
+i0_ro1 = 0      
+i1 = 0         
+j1_ro2 = 0     
+
 ring6 = []
-ring6 = ring6 + [tvs_water[0]]
-ring6 = ring6 + tvs0[j:j + 5]; j += 5                                                                                                                                                                                                                                                                                                                                                                                   
-ring6 = ring6 + [tvs_water[1]]
-ring6 = ring6 + tvs0[j:j + 5]; j += 5
-ring6 = ring6 + [tvs_water[2]]
-ring6 = ring6 + tvs0[j:j + 5]; j += 5
-ring6 = ring6 + [tvs_water[3]]
-ring6 = ring6 + tvs0[j:j + 5]; j += 5
-ring6 = ring6 + [tvs_water[4]]
-ring6 = ring6 + tvs0[j:j + 5]; j += 5
-ring6 = ring6 + [tvs_water[5]]
-ring6 = ring6 + tvs0[j:j + 5]; j += 5
+for k in range(6):
+    ring6.append(tvs_water[k])
+    ring6 += tvs0[j0:j0 + 5]
+    j0 += 5
 
-i = 0
-j = 0
-ring5 = []
-ring5 = ring5 + tvs0[j:j + 30]; j += 30
+ring5 = tvs0[j0:j0 + 30]
+j0 += 30
 
-i = 0
-j = 0
-ring4 = []
-ring4 = ring4 + tvs0[j:j + 24]; j += 24
+ring4 = tvs0[j0:j0 + 24]
+j0 += 24
 
-i = 0
-j = 0
-ring3 = [] # ro_1
-ring3 = ring3 + tvs0_ro1[i: i + 1]; i += 1
-ring3 = ring3 + tvs0[j:j + 2]; j += 2
-ring3 = ring3 + tvs0_ro1[i: i + 1]; i += 1
-ring3 = ring3 + tvs0[j:j + 2]; j += 2
-ring3 = ring3 + tvs0_ro1[i: i + 1]; i += 1
-ring3 = ring3 + tvs0[j:j + 2]; j += 2
-ring3 = ring3 + tvs0_ro1[i: i + 1]; i += 1
-ring3 = ring3 + tvs0[j:j + 2]; j += 2
-ring3 = ring3 + tvs0_ro1[i: i + 1]; i += 1
-ring3 = ring3 + tvs0[j:j + 2]; j += 2
-ring3 = ring3 + tvs0_ro1[i: i + 1]; i += 1
-ring3 = ring3 + tvs0[j:j + 2]; j += 2
+ring3 = []
+for _ in range(6):
+    ring3 += tvs0_ro1[i0_ro1:i0_ro1 + 1]
+    i0_ro1 += 1
 
-i = 0
-j = 0
-second_ring = [] # ro_2
-second_ring = second_ring + tvs1[i:i + 1];  i += 1
-second_ring = second_ring + tvs1_ro2[j:j + 1]; j +=1
-second_ring = second_ring + tvs1[i:i + 1];  i += 1
-second_ring = second_ring + tvs1_ro2[j:j + 1]; j +=1
-second_ring = second_ring + tvs1[i:i + 1];  i += 1
-second_ring = second_ring + tvs1_ro2[j:j + 1]; j +=1
-second_ring = second_ring + tvs1[i:i + 1];  i += 1
-second_ring = second_ring + tvs1_ro2[j:j + 1]; j +=1
-second_ring = second_ring + tvs1[i:i + 1];  i += 1
-second_ring = second_ring + tvs1_ro2[j:j + 1]; j +=1
-second_ring = second_ring + tvs1[i:i + 1];  i += 1
-second_ring = second_ring + tvs1_ro2[j:j + 1]; j +=1
+    ring3 += tvs0[j0:j0 + 2]
+    j0 += 2
 
+second_ring = []
+for _ in range(6):
+    second_ring += tvs1[i1:i1 + 1]
+    i1 += 1
 
-first_ring = []
-first_ring = first_ring + tvs1[i:i + 6]; i += 6
+    second_ring += tvs1_ro2[j1_ro2:j1_ro2 + 1]
+    j1_ro2 += 1
 
-inner_ring = [] # ro_1
+first_ring = tvs1[i1:i1 + 6]
+i1 += 6
+
 inner_ring = [tvs1_ro1[0]]
 
 lat.universes = [ring6, ring5, ring4, ring3, second_ring, first_ring, inner_ring]
@@ -204,6 +184,12 @@ main_univ = openmc.Universe(cells=[core_cell, steel_shell_cell])
 geomi = openmc.Geometry(main_univ)
 geomi.export_to_xml()
 
+# -------------------------------
+# MATS & CROSS_SECTION
+# -------------------------------
+openmc.config['cross_sections'] = "/home/sparrowmsu/apl/sections/endfb-viii.0-hdf5/cross_sections.xml"
+mats = openmc.Materials(materials_lst)
+mats.export_to_xml()
 
 # -------------------------------
 # PLOTS
@@ -277,41 +263,38 @@ tallies_file = openmc.Tallies()
 
 energy_filter = openmc.EnergyFilter([0., 0.625, 20.0e6])
 
-mesh = openmc.RegularMesh()
-mesh.dimension = (360, 210, 60)          
-mesh.lower_left = (-180, -105, -30)
-mesh.upper_right = (180.0, 105, 30)
+fa_tally = openmc.Tally(name='flux_heat')
+fa_tally.filters = [openmc.UniverseFilter(all_tvs)]
+fa_tally.filters.append(energy_filter)
+fa_tally.scores = ['flux', 'heating']
 
-mesh_filter = openmc.MeshFilter(mesh)
-
-tally = openmc.Tally(name='flux')
-tally.filters = [mesh_filter]
-tally.filters.append(energy_filter)
-tally.scores = ['flux']
-tallies_file.append(tally)
+tallies_file.append(fa_tally)
 tallies_file.export_to_xml()
-
 
 if RUN_OPENMC:
     openmc.run()
 
 sp = openmc.StatePoint('statepoint.10.h5')   
-t = sp.get_tally(name='flux')
+t = sp.get_tally(name='flux_heat')
 
-data = t.get_reshaped_data(value='mean', expand_dims=True).squeeze()
-thermal = data[..., 0]  
-fast = data[..., 1]      
+heat_idx = t.get_score_index('heating')
+data = t.get_reshaped_data(value='mean')
+print("shape =", data.shape)
 
-nx, ny, nz = 360, 210, 60
-x0, y0, z0 = -180, -105, -30
-x1, y1, z1 = 180, 105, 30
+for i, u in enumerate(all_tvs):
 
-# 3) 2D срез (например, по центру z)
-k = nz // 2
-plt.figure()
-plt.imshow(thermal[:, :, k].T, origin='lower', extent=[x0, x1, y0, y1], aspect='auto')
-plt.colorbar(label='Flux')
-plt.xlabel('x, cm')
-plt.ylabel('y, cm')
-plt.title('Thermal flux, z=0 slice')
-plt.show()
+    uid = u.id
+
+    heating_total = np.sum(data[i, :, 0, heat_idx])
+
+    print(f"TVS universe_id = {uid:6d}   mean heating = {heating_total:.6e}")
+
+#mesh = openmc.RegularMesh()
+## задать mesh только на область нужной ТВС
+#
+#t_flux = openmc.Tally(name='fa1007_flux_map')
+#t_flux.filters = [
+#    openmc.UniverseFilter([fa_id]),
+#    openmc.MeshFilter(mesh)
+#]
+#t_flux.scores = ['flux']
